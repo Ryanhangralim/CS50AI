@@ -22,14 +22,22 @@ def player(board):
     """
     Returns player who has the next turn on a board.
     """
-    raise NotImplementedError
+    empty_count = sum(row.count(None) for row in board)
+    return "O" if empty_count % 2 == 0 else "X"
+
 
 
 def actions(board):
     """
     Returns set of all possible actions (i, j) available on the board.
     """
-    raise NotImplementedError
+    actions = []
+    for i in range(3):
+        for j in range(3):
+            if board[i][j] == EMPTY:
+                actions.append((i, j))
+
+    return actions
 
 
 def result(board, action):
@@ -50,7 +58,9 @@ def terminal(board):
     """
     Returns True if game is over, False otherwise.
     """
-    raise NotImplementedError
+
+
+    return False
 
 
 def utility(board):
