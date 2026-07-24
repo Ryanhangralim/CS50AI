@@ -31,11 +31,13 @@ def actions(board):
     """
     Returns set of all possible actions (i, j) available on the board.
     """
-    actions = []
+    actions = set()
+
+    # Loop through all the possible action
     for i in range(3):
         for j in range(3):
             if board[i][j] == EMPTY:
-                actions.append((i, j))
+                actions.add((i, j))
 
     return actions
 
@@ -46,7 +48,7 @@ def result(board, action):
     """
     i, j = action
 
-    if i not in range(0, 2) or j not in range(0, 2):
+    if i not in range(0, 3) or j not in range(0, 3):
         raise Exception("Invalid action")
     if board[i][j] != EMPTY:
         raise Exception("Invalid action")
@@ -111,35 +113,39 @@ def minimax(board):
     current_player = player(board)
     avail_action = actions(board)
 
+    # Check if current player is either X or O 
     if current_player == X:
         move_score = []
+        # Loop through all the action in available action
         for action in avail_action:
             i, j = action 
             board[i][j] = X
 
-            score = min_value(board)
+            score = min_value(board, -math.inf, math.inf)
             move_score.append(score)
 
             board[i][j] = EMPTY 
 
+        # return index that yields the highest score
         index = move_score.index(max(move_score))
-        return avail_action[index]
+        return list(avail_action)[index]
     else :
         move_score = []
+        # Loop through all the action in available action
         for action in avail_action:
             i, j = action 
             board[i][j] = O
 
-            score = max_value(board)
+            score = max_value(board, -math.inf, math.inf)
             move_score.append(score)
 
             board[i][j] = EMPTY
 
+        # return index that yields the lowest score
         index = move_score.index(min(move_score))
-        return avail_action[index]
+        return list(avail_action)[index]
 
-def max_value(board):
-
+def max_value(board, alpha, beta):
     if terminal(board):
         return utility(board)
 
@@ -149,15 +155,22 @@ def max_value(board):
         i,j = action 
         board[i][j] = X
 
-        score = min_value(board)
+        score = min_value(board, alpha, beta)
 
         board[i][j] = EMPTY
 
         best = max(best, score)
 
+        # Update alpha
+        alpha = max(alpha, best)
+
+        # Prune
+        if alpha >= beta:
+            break
+
     return best
 
-def min_value(board):
+def min_value(board, alpha, beta):
 
     if terminal(board):
         return utility(board)
@@ -168,10 +181,17 @@ def min_value(board):
         i,j = action 
         board[i][j] = O
 
-        score = max_value(board)
+        score = max_value(board, alpha, beta)
 
         board[i][j] = EMPTY
 
         best = min(best, score)
+
+        # Update beta
+        beta = min(beta, best)
+
+        # Prune
+        if alpha >= beta:
+            break
 
     return best
